@@ -14,4 +14,5 @@ urlpatterns = [
     path("post/like-post/", api_views.LikePostAPIView.as_view()),
     path("post/comment-post/", api_views.PostCommentAPIView.as_view()),
     path("post/bookmark-post/", api_views.BookmarkPostAPIView.as_view()),
+    path("author/dashboard/stats/<user_id>/", api_views.DashboardStats.as_view()),
 ]
