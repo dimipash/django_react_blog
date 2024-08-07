@@ -1,9 +1,29 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../partials/Header";
 import Footer from "../partials/Footer";
 import { Link } from "react-router-dom";
-
+import apiInstance from "../../utils/axios";
+import { useParams } from "react-router-dom";
+import moment from "moment";
 function Detail() {
+    const [post, setPost] = useState([])
+    const [tags, setTags] = useState([])
+
+    const param = useParams();
+
+    const fetchPost = async () => {
+        const response = await apiInstance.get(`post/detail/${param.slug}/`);
+        setPost(response.data);
+
+        const tagArray = response.data?.tags?.split(",");
+        setTags(tagArray);
+    };
+
+    useEffect(() => {
+        fetchPost();
+        console.log(post);
+    }, []);
+
     return (
         <>
             <Header />
@@ -15,7 +35,7 @@ function Detail() {
                                 <i className="small fw-bold " />
                                 Lifestyle
                             </a>
-                            <h1 className="text-center">10 tell-tale signs you need to get a new startup.</h1>
+                            <h1 className="text-center">{post.title}</h1>
                         </div>
                     </div>
                 </div>
@@ -28,61 +48,44 @@ function Detail() {
                             <div className="text-start text-lg-center mb-5" data-sticky="" data-margin-top={80} data-sticky-for={991}>
                                 <div className="position-relative">
                                     <div className="avatar avatar-xl">
-                                        <img className="avatar-img" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "50%" }} src="https://awcdn1.ahmad.works/writing/wp-content/uploads/2015/05/Author.jpg" alt="avatar" />
+                                    <img className="avatar-img" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "50%" }} src={post.image} alt="avatar" />
                                     </div>
                                     <a href="#" className="h5 fw-bold text-dark text-decoration-none mt-2 mb-0 d-block">
-                                        Louis Ferguson
+                                        {post?.profile?.full_name}
                                     </a>
-                                    <p>Writer at Desphixs</p>
+                                    <p>{post?.profile?.bio || ""}</p>
                                 </div>
 
                                 <hr className="d-none d-lg-block " />
 
                                 <ul className="list-inline list-unstyled">
                                     <li className="list-inline-item d-lg-block my-lg-2 text-start">
-                                        <i className="fas fa-calendar"></i> Nov 15, 2022
+                                        {/* <i className="fas fa-calendar"></i> {post.date} */}
                                     </li>
-                                    <li className="list-inline-item d-lg-block my-lg-2 text-start">
+                                    {/* <li className="list-inline-item d-lg-block my-lg-2 text-start">
                                         <i className="fas fa-clock"></i> 5 min read
-                                    </li>
+                                    </li> */}
                                     <li className="list-inline-item d-lg-block my-lg-2 text-start">
                                         <a href="#" className="text-body">
                                             <i className="fas fa-heart me-1" />
                                         </a>
-                                        266 Likes
+                                        {post?.likes?.length} Likes
                                     </li>
                                     <li className="list-inline-item d-lg-block my-lg-2 text-start">
                                         <i className="fas fa-eye" />
-                                        344 Views
+                                        {post.view} Views
                                     </li>
                                 </ul>
                                 {/* Tags */}
                                 <ul className="list-inline text-primary-hover mt-0 mt-lg-3 text-start">
-                                    <li className="list-inline-item">
+                                    {tags?.map((tag, index) => (
+                                        <li className="list-inline-item" key={index}>
                                         <a className="text-body text-decoration-none fw-bold" href="#">
-                                            #agency
+                                            #{tag}
                                         </a>
                                     </li>
-                                    <li className="list-inline-item">
-                                        <a className="text-body text-decoration-none fw-bold" href="#">
-                                            #business
-                                        </a>
-                                    </li>
-                                    <li className="list-inline-item">
-                                        <a className="text-body text-decoration-none fw-bold" href="#">
-                                            #theme
-                                        </a>
-                                    </li>
-                                    <li className="list-inline-item">
-                                        <a className="text-body text-decoration-none fw-bold" href="#">
-                                            #bootstrap
-                                        </a>
-                                    </li>
-                                    <li className="list-inline-item">
-                                        <a className="text-body text-decoration-none fw-bold" href="#">
-                                            #marketing
-                                        </a>
-                                    </li>
+                                    ))}
+                                    
                                 </ul>
                             </div>
                         </div>
@@ -90,26 +93,11 @@ function Detail() {
                         {/* Main Content START */}
                         <div className="col-lg-10 mb-5">
                             <p>
-                                <b>Moonlight</b> newspaper up its enjoyment agreeable depending. Timed voice share led him to widen noisy young. At weddings believed laughing although the material does the exercise of. Up attempt offered ye civilly so sitting to. She new course gets living within
-                                Elinor joy. She rapturous suffering concealed.
+                                {post.description}
                             </p>
-                            <p>
-                                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Laborum est tenetur voluptatibus itaque dolor saepe mollitia et ratione odio nisi! Explicabo quod tempore voluptatibus perspiciatis, nihil dolorem magni, corrupti odio dignissimos ut temporibus laboriosam
-                                dolore vero repudiandae asperiores incidunt reiciendis corporis odit a maxime. Accusantium excepturi ut aliquid accusamus necessitatibus minus odit, assumenda rerum. Tempora deserunt officiis expedita, excepturi nihil, velit similique necessitatibus natus explicabo
-                                veritatis, vitae temporibus aliquam dicta ea. Nesciunt et fuga quis atque debitis. Vero nihil aperiam voluptatibus. Architecto reiciendis necessitatibus explicabo repellendus corrupti pariatur velit aperiam! Ad, numquam expedita iste labore tempore necessitatibus
-                                praesentium libero pariatur.
-                            </p>
-                            <p>
-                                <b>
-                                    <i>
-                                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum totam quasi impedit nostrum hic consequatur! Tenetur dignissimos debitis ea ut magni laboriosam animi provident ab minima dolorem facilis minus amet culpa quam odio consectetur eos mollitia dolorum
-                                        cumque at soluta atque nam, quia eaque! Sint quisquam fuga sapiente facilis provident, ullam officia! Alias voluptates officia natus eaque voluptate illum est.
-                                    </i>
-                                </b>
-                            </p>
-                            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Debitis, culpa mollitia nam, ipsum hic dolorum, beatae at quis ea cum id temporibus? Asperiores, atque eos voluptatibus explicabo cum voluptatum placeat.</p>
+                            
 
-                            <div className="mt-5">
+                            {/* <div className="mt-5">
                                 <h2 className="my-3">
                                     <i className="bi bi-symmetry-vertical me-2" />
                                     Related post
@@ -179,7 +167,7 @@ function Detail() {
                                         </div>
                                     </div>
                                 </section>
-                            </div>
+                            </div> */}
 
                             <hr />
                             <div className="d-flex py-4">
