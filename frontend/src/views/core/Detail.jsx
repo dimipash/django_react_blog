@@ -49,6 +49,16 @@ function Detail() {
 		setCreateComment({full_name: "", email: "", comment: ""});
 	}
 
+	const handleLikePost = async () => {
+		const json = {
+			user_id: 1,
+			post_id: post?.id,
+		};
+		const response = await apiInstance.post(`post/like-post/`, json);		
+		Toast("success", response.data.message);
+		fetchPost();
+	}
+
 	return (
 		<>
 			<Header />
@@ -138,6 +148,16 @@ function Detail() {
 										</li>
 									))}
 								</ul>
+
+								<button onClick={handleLikePost} className="btn btn-primary">
+									<i className="fas fa-thumbs-up me-2"></i>
+									{post?.likes?.length}
+								</button>
+
+								<button className="btn btn-danger ms-2">
+									<i className="fas fa-bookmark"></i>
+								</button>
+
 							</div>
 						</div>
 						{/* Left sidebar END */}
