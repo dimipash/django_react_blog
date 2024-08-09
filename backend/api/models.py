@@ -122,6 +122,9 @@ class Post(models.Model):
             self.slug = slugify(self.title) + "-" + shortuuid.uuid()[:2]
         super(Post, self).save(*args, **kwargs)
 
+    def comments(self):
+        return Comment.objects.filter(post=self).order_by("-id")
+
 class Comment(models.Model):
 
     class Meta:

@@ -57,6 +57,11 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = api_models.Profile
         fields = "__all__"
 
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['user'] = UserSerializer(instance.user).data
+        return response
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -81,18 +86,21 @@ class CommentSerializer(serializers.ModelSerializer):
                 self.Meta.depth = 1
 
 class PostSerializer(serializers.ModelSerializer):
+    comments = CommentSerializer(many=True, read_only=True)
+    
     class Meta:
         model = api_models.Post
         fields = "__all__"
 
-    def __init___(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(PostSerializer, self).__init__(*args, **kwargs)
         request = self.context.get("request")
-        if request and request.method == "POST":
-            if request and request.method == "POST":
-                self.Meta.depth = 0
-            else:
-                self.Meta.depth = 1
+        if request and request.method != "POST":
+            self.fields['user'] = UserSerializer()
+            self.fields['profile'] = ProfileSerializer()
+        else:
+            self.fields['user'] = serializers.PrimaryKeyRelatedField(read_only=True)
+            self.fields['profile'] = serializers.PrimaryKeyRelatedField(read_only=True)
 
 class BookmarkSerializer(serializers.ModelSerializer):
     class Meta:
