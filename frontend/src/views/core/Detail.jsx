@@ -47,7 +47,7 @@ function Detail() {
 		Toast("success", "Comment posted");
 		fetchPost();
 		setCreateComment({full_name: "", email: "", comment: ""});
-	}
+	};
 
 	const handleLikePost = async () => {
 		const json = {
@@ -55,6 +55,18 @@ function Detail() {
 			post_id: post?.id,
 		};
 		const response = await apiInstance.post(`post/like-post/`, json);		
+		Toast("success", response.data.message);
+		fetchPost();
+	};
+
+	const handleBookmarkPost = async() => {
+		const json = {
+			user_id: 1,
+            post_id: post?.id,
+		};
+
+		const response = await apiInstance.post(`post/bookmark-post/`, json);
+		console.log(response.data);
 		Toast("success", response.data.message);
 		fetchPost();
 	}
@@ -154,7 +166,7 @@ function Detail() {
 									{post?.likes?.length}
 								</button>
 
-								<button className="btn btn-danger ms-2">
+								<button onClick={handleBookmarkPost} className="btn btn-danger ms-2">
 									<i className="fas fa-bookmark"></i>
 								</button>
 
