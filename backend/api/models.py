@@ -101,9 +101,7 @@ class Post(models.Model):
     profile = models.ForeignKey(
         Profile, on_delete=models.CASCADE, null=True, blank=True
     )
-    category = models.ForeignKey(
-        Category, on_delete=models.CASCADE, null=True, blank=True
-    )
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='posts')
     title = models.CharField(max_length=100)    
     tags = models.CharField(max_length=100, null=True, blank=True)    
     description = models.TextField(null=True, blank=True)

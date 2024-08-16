@@ -1,9 +1,40 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../partials/Header";
 import Footer from "../partials/Footer";
 import { Link } from "react-router-dom";
+import useUserData from "../../plugin/useUserData";
+import apiInstance from "../../utils/axios";
+import moment from "moment";
 
 function Dashboard() {
+    const [stats, setStats] = useState([]);
+    const [posts, setPosts] = useState([]);
+    const [comments, setComments] = useState([]);
+    const [noti, setNoti] = useState([]);
+
+    const userId = useUserData()?.user_id;
+
+    const fetchDashboardData = async () => {
+        const stats_res = await apiInstance.get(`author/dashboard/stats/${userId}/`);
+        setStats(stats_res.data[0]);
+
+        const post_res = await apiInstance.get(`author/dashboard/post-list/${userId}/`);
+        setPosts(post_res.data); 
+        console.log(post_res.data)
+
+        const comment_res = await apiInstance.get(`author/dashboard/comment-list/${userId}/`);
+        setComments(comment_res.data);
+
+        const noti_res = await apiInstance.get(`author/dashboard/noti-list/${userId}/`);
+        setNoti(noti_res.data);
+        
+        
+    };
+
+    useEffect(() => {
+        fetchDashboardData();
+    }, []);
+
     return (
         <>
             <Header />
@@ -19,7 +50,7 @@ function Dashboard() {
                                                 <i className="bi bi-people-fill" />
                                             </div>
                                             <div className="ms-3">
-                                                <h3>654</h3>
+                                                <h3>{stats?.views}</h3>
                                                 <h6 className="mb-0">Total Views</h6>
                                             </div>
                                         </div>
@@ -32,7 +63,7 @@ function Dashboard() {
                                                 <i className="bi bi-file-earmark-text-fill" />
                                             </div>
                                             <div className="ms-3">
-                                                <h3>25</h3>
+                                                <h3>{stats?.posts}</h3>
                                                 <h6 className="mb-0">Posts</h6>
                                             </div>
                                         </div>
@@ -45,7 +76,7 @@ function Dashboard() {
                                                 <i className="bi bi-suit-heart-fill" />
                                             </div>
                                             <div className="ms-3">
-                                                <h3>210</h3>
+                                                <h3>{stats?.likes}</h3>
                                                 <h6 className="mb-0">Likes</h6>
                                             </div>
                                         </div>
@@ -58,7 +89,7 @@ function Dashboard() {
                                                 <i className="bi bi-tag" />
                                             </div>
                                             <div className="ms-3">
-                                                <h3>84K</h3>
+                                                <h3>{stats?.views}</h3>
                                                 <h6 className="mb-0">Bookmarks</h6>
                                             </div>
                                         </div>
@@ -79,62 +110,35 @@ function Dashboard() {
                                 </div>
                                 <div className="card-body p-3">
                                     <div className="row">
-                                        <div className="col-12">
+                                        {posts?.slice(0, 3)?.map((p, index) => (
+                                            <div key={index}>
+                                            <div className="col-12">
                                             <div className="d-flex position-relative">
-                                                <img className="w-60 rounded" src="https://awcdn1.ahmad.works/writing/wp-content/uploads/2015/05/flat-with-touch-of-creativity-PX387LV-2.jpg" style={{ width: "100px", height: "110px", objectFit: "cover", borderRadius: "10px" }} alt="product" />
+                                                <img className="w-60 rounded" src={p?.image} style={{ width: "100px", height: "110px", objectFit: "cover", borderRadius: "10px" }} alt="product" />
                                                 <div className="ms-3">
                                                     <a href="#" className="h6 stretched-link text-decoration-none text-dark">
-                                                        Dirty little secrets about the business industry
+                                                        {p?.title}
                                                     </a>
                                                     <p className="small mb-0 mt-3">
-                                                        <i className="fas fa-calendar me-2"></i>Jun 17, 2022
+                                                        <i className="fas fa-calendar me-2"></i>{moment(p.date).format("DD MMM YYYY")}
                                                     </p>
                                                     <p className="small mb-0">
-                                                        <i className="fas fa-eye me-2"></i>10 Views
+                                                        <i className="fas fa-eye me-2"></i>{p?.view} Views
                                                     </p>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <hr className="my-3" />
-                                        <div className="col-12">
-                                            <div className="d-flex position-relative">
-                                                <img className="w-60 rounded" src="https://awcdn1.ahmad.works/writing/wp-content/uploads/2015/05/flat-with-touch-of-creativity-PX387LV-2.jpg" style={{ width: "100px", height: "110px", objectFit: "cover", borderRadius: "10px" }} alt="product" />
-                                                <div className="ms-3">
-                                                    <a href="#" className="h6 stretched-link text-decoration-none text-dark">
-                                                        Dirty little secrets about the business industry
-                                                    </a>
-                                                    <p className="small mb-0 mt-3">
-                                                        <i className="fas fa-calendar me-2"></i>Jun 17, 2022
-                                                    </p>
-                                                    <p className="small mb-0">
-                                                        <i className="fas fa-eye me-2"></i>10 Views
-                                                    </p>
-                                                </div>
                                             </div>
-                                        </div>
-                                        <hr className="my-3" />
-                                        <div className="col-12">
-                                            <div className="d-flex position-relative">
-                                                <img className="w-60 rounded" src="https://awcdn1.ahmad.works/writing/wp-content/uploads/2015/05/flat-with-touch-of-creativity-PX387LV-2.jpg" style={{ width: "100px", height: "110px", objectFit: "cover", borderRadius: "10px" }} alt="product" />
-                                                <div className="ms-3">
-                                                    <a href="#" className="h6 stretched-link text-decoration-none text-dark">
-                                                        Dirty little secrets about the business industry
-                                                    </a>
-                                                    <p className="small mb-0 mt-3">
-                                                        <i className="fas fa-calendar me-2"></i>Jun 17, 2022
-                                                    </p>
-                                                    <p className="small mb-0">
-                                                        <i className="fas fa-eye me-2"></i>10 Views
-                                                    </p>
-                                                </div>
+                                            <hr className="my-3" />
                                             </div>
-                                        </div>
+                                        ))}
+                                        
+                                        
                                     </div>
                                 </div>
                                 <div className="card-footer border-top text-center p-3">
-                                    <a href="#" className="fw-bold text-decoration-none text-dark">
+                                    <Link to="/post/" className="fw-bold text-decoration-none text-dark">
                                         View all Posts
-                                    </a>
+                                    </Link>
                                 </div>
                             </div>
                         </div>
@@ -150,79 +154,41 @@ function Dashboard() {
                                 </div>
                                 <div className="card-body p-3">
                                     <div className="row">
-                                        <div className="col-12">
-                                            <div className="d-flex align-items-center position-relative">
-                                                <div className="avatar avatar-lg flex-shrink-0">
-                                                    <img className="avatar-img" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVSPtLWfht2p015onFngljcoIuA9xc8h3RLA&usqp=CAU" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "50%" }} alt="avatar" />
-                                                </div>
-                                                <div className="ms-3">
-                                                    <p className="mb-1">
-                                                        {" "}
-                                                        <a className="h6 stretched-link text-decoration-none text-dark" href="#">
-                                                            {" "}
-                                                            Thanks for the post, please post regulary.{" "}
-                                                        </a>
-                                                    </p>
-                                                    <div className="d-flex justify-content-between">
-                                                        <p className="small mb-0">
-                                                            <i>by</i> Monica Sweet
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <hr className="my-3" />
-                                        <div className="col-12">
-                                            <div className="d-flex align-items-center position-relative">
-                                                <div className="avatar avatar-lg flex-shrink-0">
-                                                    <img className="avatar-img" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVSPtLWfht2p015onFngljcoIuA9xc8h3RLA&usqp=CAU" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "50%" }} alt="avatar" />
-                                                </div>
-                                                <div className="ms-3">
-                                                    <p className="mb-1">
-                                                        {" "}
-                                                        <a className="h6 stretched-link text-decoration-none text-dark" href="#">
-                                                            {" "}
-                                                            Thanks for the post, please post regulary.{" "}
-                                                        </a>
-                                                    </p>
-                                                    <div className="d-flex justify-content-between">
-                                                        <p className="small mb-0">
-                                                            <i>by</i> Monica Sweet
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <hr className="my-3" />
 
-                                        <div className="col-12">
+                                        {comments?.slice(0, 3)?.map((c, index) => (
+                                        <div key={index}>
+                                            <div className="col-12">
                                             <div className="d-flex align-items-center position-relative">
                                                 <div className="avatar avatar-lg flex-shrink-0">
-                                                    <img className="avatar-img" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVSPtLWfht2p015onFngljcoIuA9xc8h3RLA&usqp=CAU" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "50%" }} alt="avatar" />
+                                                    <img className="avatar-img" src="https://i.pinimg.com/736x/0d/64/98/0d64989794b1a4c9d89bff571d3d5842.jpg" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "50%" }} alt="avatar" />
                                                 </div>
                                                 <div className="ms-3">
                                                     <p className="mb-1">
                                                         {" "}
                                                         <a className="h6 stretched-link text-decoration-none text-dark" href="#">
                                                             {" "}
-                                                            Thanks for the post, please post regulary.{" "}
+                                                            {c?.comment}{" "}
                                                         </a>
                                                     </p>
                                                     <div className="d-flex justify-content-between">
                                                         <p className="small mb-0">
-                                                            <i>by</i> Monica Sweet
+                                                            <i>by</i> {c?.name}
                                                         </p>
                                                     </div>
                                                 </div>
                                             </div>
+                                            </div>
+                                            <hr className="my-3" />
                                         </div>
+                                        ))}
+                                        
                                     </div>
                                 </div>
 
                                 <div className="card-footer border-top text-center p-3">
-                                    <a href="#" className="fw-bold text-decoration-none text-dark">
+                                    <Link to="/comments/" className="fw-bold text-decoration-none text-dark">
                                         View all Comments
-                                    </a>
+                                    </Link>
                                 </div>
                             </div>
                         </div>
@@ -239,68 +205,34 @@ function Dashboard() {
                                 <div className="card-body p-3">
                                     <div className="custom-scrollbar h-350">
                                         <div className="row">
-                                            <div className="col-12">
+
+                                            {noti?.slice(0, 3)?.map((n, index) => (
+                                                <div key={index}>
+                                                    <div className="col-12">
                                                 <div className="d-flex justify-content-between position-relative">
                                                     <div className="d-sm-flex">
                                                         <div className="icon-lg bg-opacity-15 rounded-2 flex-shrink-0">
                                                             <i className="fas fa-thumbs-up text-primary fs-5" />
                                                         </div>
                                                         <div className="ms-0 ms-sm-3 mt-2 mt-sm-0">
-                                                            <h6 className="mb-0">
-                                                                <a href="#" className="stretched-link text-decoration-none text-dark fw-bold">
-                                                                    New Like
-                                                                </a>
-                                                            </h6>
+                                                            <h6 className="mb-0">{n.type}</h6>     
+                                                            
                                                             <p className="mb-0">
-                                                                Destiny Franks liked your post <b>7 Commom mistakes...</b>
+                                                                    {n.type === "Like" && (
+                                                                        <p>
+                                                                            Someone liked your post
+                                                                        </p>
+                                                                    )}
                                                             </p>
-                                                            <span className="small">5 min ago</span>
+                                                            <span className="small">{moment(n.date).format("DD MMM YYYY")}</span>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <hr className="my-3" />
-                                            <div className="col-12">
-                                                <div className="d-flex justify-content-between position-relative">
-                                                    <div className="d-sm-flex">
-                                                        <div className="icon-lg bg-opacity-15 rounded-2 flex-shrink-0">
-                                                            <i className="bi bi-chat-left-quote-fill text-success fs-5" />
-                                                        </div>
-                                                        <div className="ms-0 ms-sm-3 mt-2 mt-sm-0">
-                                                            <h6 className="mb-0">
-                                                                <a href="#" className="stretched-link text-decoration-none text-dark fw-bold">
-                                                                    New Comment
-                                                                </a>
-                                                            </h6>
-                                                            <p className="mb-0">
-                                                                Joy Winter liked commented on your post <b>7 Commom mistakes...</b>
-                                                            </p>
-                                                            <span className="small">5 min ago</span>
-                                                        </div>
-                                                    </div>
+                                            <hr className="my-3" />    
                                                 </div>
-                                            </div>
-                                            <hr className="my-3" />
-                                            <div className="col-12">
-                                                <div className="d-flex justify-content-between position-relative">
-                                                    <div className="d-sm-flex">
-                                                        <div className="icon-lg bg-opacity-15 rounded-2 flex-shrink-0">
-                                                            <i className="bi bi-tag-fill text-danger fs-5" />
-                                                        </div>
-                                                        <div className="ms-0 ms-sm-3 mt-2 mt-sm-0">
-                                                            <h6 className="mb-0">
-                                                                <a href="#" className="stretched-link text-decoration-none text-dark fw-bold">
-                                                                    New Bookmark
-                                                                </a>
-                                                            </h6>
-                                                            <p className="mb-0">
-                                                                Flourish Franks bookmarked your post <b>7 Commom mistakes...</b>
-                                                            </p>
-                                                            <span className="small">5 min ago</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            ))}
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -376,25 +308,26 @@ function Dashboard() {
                                                 </tr>
                                             </thead>
                                             <tbody className="border-top-0">
-                                                <tr>
+                                                {posts?.map((p, index) => (                                                   
+                                                        <tr key={index}>
                                                     <td>
                                                         <h6 className="mt-2 mt-md-0 mb-0 ">
                                                             <a href="#" className="text-dark text-decoration-none">
-                                                                How to become a better django and react developer
+                                                                {p?.title}
                                                             </a>
                                                         </h6>
                                                     </td>
                                                     <td>
                                                         <h6 className="mb-0">
                                                             <a href="#" className="text-dark text-decoration-none">
-                                                                201 Views
+                                                                {p?.view} Views
                                                             </a>
                                                         </h6>
                                                     </td>
-                                                    <td>March 21, 2024.</td>
-                                                    <td>Technology</td>
+                                                    <td>{moment(p?.date).format("DD MMM YYYY")}</td>
+                                                <td>{p?.category?.title}</td>
                                                     <td>
-                                                        <span className="badge bg-success bg-opacity-10 text-success mb-2">Live</span>
+                                                        <span className="badge bg-dark text-white mb-2">{p?.status}</span>
                                                     </td>
                                                     <td>
                                                         <div className="d-flex gap-2">
@@ -407,134 +340,10 @@ function Dashboard() {
                                                         </div>
                                                     </td>
                                                 </tr>
+                                                    
+                                                ))}
 
-                                                <tr>
-                                                    <td>
-                                                        <h6 className="mt-2 mt-md-0 mb-0 ">
-                                                            <a href="#" className="text-dark text-decoration-none">
-                                                                How to become a better django and react developer
-                                                            </a>
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 className="mb-0">
-                                                            <a href="#" className="text-dark text-decoration-none">
-                                                                201 Views
-                                                            </a>
-                                                        </h6>
-                                                    </td>
-                                                    <td>March 21, 2024.</td>
-                                                    <td>Technology</td>
-                                                    <td>
-                                                        <span className="badge bg-success bg-opacity-10 text-success mb-2">Live</span>
-                                                    </td>
-                                                    <td>
-                                                        <div className="d-flex gap-2">
-                                                            <a href="#" className="btn-round mb-0 btn btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
-                                                                <i className="bi bi-trash" />
-                                                            </a>
-                                                            <a href="dashboard-post-edit.html" className="btn btn-primary btn-round mb-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
-                                                                <i className="bi bi-pencil-square" />
-                                                            </a>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td>
-                                                        <h6 className="mt-2 mt-md-0 mb-0 ">
-                                                            <a href="#" className="text-dark text-decoration-none">
-                                                                How to become a better django and react developer
-                                                            </a>
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 className="mb-0">
-                                                            <a href="#" className="text-dark text-decoration-none">
-                                                                201 Views
-                                                            </a>
-                                                        </h6>
-                                                    </td>
-                                                    <td>March 21, 2024.</td>
-                                                    <td>Technology</td>
-                                                    <td>
-                                                        <span className="badge bg-success bg-opacity-10 text-success mb-2">Live</span>
-                                                    </td>
-                                                    <td>
-                                                        <div className="d-flex gap-2">
-                                                            <a href="#" className="btn-round mb-0 btn btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
-                                                                <i className="bi bi-trash" />
-                                                            </a>
-                                                            <a href="dashboard-post-edit.html" className="btn btn-primary btn-round mb-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
-                                                                <i className="bi bi-pencil-square" />
-                                                            </a>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td>
-                                                        <h6 className="mt-2 mt-md-0 mb-0 ">
-                                                            <a href="#" className="text-dark text-decoration-none">
-                                                                How to become a better django and react developer
-                                                            </a>
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 className="mb-0">
-                                                            <a href="#" className="text-dark text-decoration-none">
-                                                                201 Views
-                                                            </a>
-                                                        </h6>
-                                                    </td>
-                                                    <td>March 21, 2024.</td>
-                                                    <td>Technology</td>
-                                                    <td>
-                                                        <span className="badge bg-success bg-opacity-10 text-success mb-2">Live</span>
-                                                    </td>
-                                                    <td>
-                                                        <div className="d-flex gap-2">
-                                                            <a href="#" className="btn-round mb-0 btn btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
-                                                                <i className="bi bi-trash" />
-                                                            </a>
-                                                            <a href="dashboard-post-edit.html" className="btn btn-primary btn-round mb-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
-                                                                <i className="bi bi-pencil-square" />
-                                                            </a>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td>
-                                                        <h6 className="mt-2 mt-md-0 mb-0 ">
-                                                            <a href="#" className="text-dark text-decoration-none">
-                                                                How to become a better django and react developer
-                                                            </a>
-                                                        </h6>
-                                                    </td>
-                                                    <td>
-                                                        <h6 className="mb-0">
-                                                            <a href="#" className="text-dark text-decoration-none">
-                                                                201 Views
-                                                            </a>
-                                                        </h6>
-                                                    </td>
-                                                    <td>March 21, 2024.</td>
-                                                    <td>Technology</td>
-                                                    <td>
-                                                        <span className="badge bg-success bg-opacity-10 text-success mb-2">Live</span>
-                                                    </td>
-                                                    <td>
-                                                        <div className="d-flex gap-2">
-                                                            <a href="#" className="btn-round mb-0 btn btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
-                                                                <i className="bi bi-trash" />
-                                                            </a>
-                                                            <a href="dashboard-post-edit.html" className="btn btn-primary btn-round mb-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
-                                                                <i className="bi bi-pencil-square" />
-                                                            </a>
-                                                        </div>
-                                                    </td>
-                                                </tr>
+                                                
                                             </tbody>
                                         </table>
                                     </div>

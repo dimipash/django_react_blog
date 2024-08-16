@@ -98,9 +98,11 @@ class PostSerializer(serializers.ModelSerializer):
         if request and request.method != "POST":
             self.fields['user'] = UserSerializer()
             self.fields['profile'] = ProfileSerializer()
+            self.fields['category'] = CategorySerializer()
         else:
             self.fields['user'] = serializers.PrimaryKeyRelatedField(read_only=True)
             self.fields['profile'] = serializers.PrimaryKeyRelatedField(read_only=True)
+            
 
 class BookmarkSerializer(serializers.ModelSerializer):
     class Meta:
