@@ -9,7 +9,7 @@ import moment from "moment";
 function Posts() {
 
     const [posts, setPosts] = useState([]);
-    const user_id = useUserData()?.user_id
+    const userId = useUserData()?.user_id
 
     const fetchPost = async () => {
         try {
@@ -19,6 +19,33 @@ function Posts() {
         } catch (error) {
             console.log(error)
         }
+    }
+
+    const handleSearch = (e) => {
+        const query = e.target.value.toLowerCase()
+        if (query === "") {
+            fetchPost();
+        } else {
+            const filtered = posts.filter((p) => {
+                return p.title.toLowerCase( ).includes(query);
+            })
+            setPosts(filtered)
+        }
+    }
+
+    const handleSortChange = (e) => {
+        const sortValue = e.target.value
+        const sortedPosts = [...posts]
+        console.log(sortedPosts)
+
+        if (sortValue === "Newest") {
+            sortedPosts.sort((a, b) => new Date(b.date) - new Date(a.date))
+        } else if (sortValue === "Oldest") {
+            sortedPosts.sort((a, b) => new Date(a.date) - new Date(b.date))
+        }
+
+        setPosts(sortedPosts)
+
     }
 
     useEffect(() => {
@@ -36,7 +63,7 @@ function Posts() {
                                 <div className="card-header bg-transparent border-bottom p-3">
                                     <div className="d-sm-flex justify-content-between align-items-center">
                                         <h5 className="mb-2 mb-sm-0">
-                                            All Blog Posts <span className="badge bg-primary bg-opacity-10 text-primary">5</span>
+                                            All Blog Posts <span className="badge bg-primary bg-opacity-10 text-primary">{posts?.length}</span>
                                         </h5>
                                         <a href="#" className="btn btn-sm btn-primary mb-0">
                                             Add New <i className="fas fa-plus"></i>
@@ -47,7 +74,7 @@ function Posts() {
                                     <div className="row g-3 align-items-center justify-content-between mb-3">
                                         <div className="col-md-8">
                                             <form className="rounded position-relative">
-                                                <input className="form-control pe-5 bg-transparent" type="search" placeholder="Search Articles" aria-label="Search" />
+                                                <input onChange={(e) => handleSearch(e)} className="form-control pe-5 bg-transparent" type="search" placeholder="Search Articles" aria-label="Search" />
                                                 <button className="btn bg-transparent border-0 px-2 py-0 position-absolute top-50 end-0 translate-middle-y" type="submit">
                                                     <i className="fas fa-search fs-6 " />
                                                 </button>
@@ -55,10 +82,10 @@ function Posts() {
                                         </div>
                                         <div className="col-md-3">
                                             <form>
-                                                <select className="form-select z-index-9 bg-transparent" aria-label=".form-select-sm">
+                                                <select onChange={handleSortChange} className="form-select z-index-9 bg-transparent" aria-label=".form-select-sm">
                                                     <option value="">Sort by</option>
-                                                    <option>Newest</option>
-                                                    <option>Oldest</option>
+                                                    <option value={"Newest"}>Newest</option>
+                                                    <option value={"Oldest"}>Oldest</option>
                                                 </select>
                                             </form>
                                         </div>
@@ -136,7 +163,7 @@ function Posts() {
                     </div>
                 </div>
             </section>
-            <Footer />
+            {/* <Footer /> */}
         </>
     );
 }
