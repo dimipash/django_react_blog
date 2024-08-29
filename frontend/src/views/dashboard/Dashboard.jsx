@@ -16,14 +16,14 @@ function Dashboard() {
 
     const fetchDashboardData = async () => {
         const stats_res = await apiInstance.get(`author/dashboard/stats/${userId}/`);
-        setStats(stats_res.data[0]);
+        setStats(stats_res?.data[0]);
 
         const post_res = await apiInstance.get(`author/dashboard/post-list/${userId}/`);
         setPosts(post_res.data); 
-        console.log(post_res.data)
+        console.log(post_res?.data)
 
         const comment_res = await apiInstance.get(`author/dashboard/comment-list/${userId}/`);
-        setComments(comment_res.data);
+        setComments(comment_res?.data);
 
         const noti_res = await apiInstance.get(`author/dashboard/noti-list/${userId}/`);
         setNoti(noti_res.data);
@@ -307,6 +307,7 @@ function Dashboard() {
                                                     </th>
                                                 </tr>
                                             </thead>
+                                            
                                             <tbody className="border-top-0">
                                                 {posts?.map((p, index) => (                                                   
                                                         <tr key={index}>
