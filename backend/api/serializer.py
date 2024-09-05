@@ -119,18 +119,20 @@ class BookmarkSerializer(serializers.ModelSerializer):
                 self.Meta.depth = 1
 
 class NotificationSerializer(serializers.ModelSerializer):
+    post = PostSerializer(read_only=True)
+    user = UserSerializer(read_only=True)
+
     class Meta:
         model = api_models.Notification
         fields = "__all__"
 
-    def __init___(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(NotificationSerializer, self).__init__(*args, **kwargs)
         request = self.context.get("request")
         if request and request.method == "POST":
-            if request and request.method == "POST":
-                self.Meta.depth = 0
-            else:
-                self.Meta.depth = 1
+            self.Meta.depth = 0
+        else:
+            self.Meta.depth = 1
 
 class AuthorSerializer(serializers.Serializer):
     views = serializers.IntegerField(default=0)
