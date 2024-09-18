@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../partials/Header";
 import Footer from "../partials/Footer";
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
 
 import apiInstance from "../../utils/axios";
 import useUserData from "../../plugin/useUserData";

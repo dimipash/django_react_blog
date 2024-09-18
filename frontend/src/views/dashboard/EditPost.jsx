@@ -1,9 +1,119 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import Header from "../partials/Header";
 import Footer from "../partials/Footer";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+
+import apiInstance from "../../utils/axios";
+import useUserData from "../../plugin/useUserData";
+import Toast from "../../plugin/Toast";
+import Swal from "sweetalert2";
 
 function AddPost() {
+    const [post, setEditPost] = useState({
+        image: "",
+        title: "",
+        description: "",
+        category: parseInt(""),
+        tags: "",
+        status: "",
+    });
+    const [imagePreview, setImagePreview] = useState("");
+    const [categoryList, setCategoryList] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const userId = useUserData()?.user_id;
+    const navigate = useNavigate();
+    const param = useParams();
+
+    const fetchPost = async () => {
+        const response = await apiInstance.get(
+            `author/dashboard/post-detail/${userId}/${param?.id}/`
+        );
+        console.log(response.data);
+        setEditPost(response.data);
+    };
+
+    const fetchCategory = async () => {
+        try {
+            const response = await apiInstance.get(`post/category/list/`);
+
+            setCategoryList(response.data);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchCategory();
+        fetchPost();
+    }, []);
+
+    const handleCreatePostChange = (event) => {
+        setEditPost({
+            ...post,
+            [event.target.name]: event.target.value,
+        });
+    };
+
+    const handleFileChange = (event) => {
+        const selectedFile = event.target.files[0];
+        const reader = new FileReader();
+
+        setEditPost({
+            ...post,
+            image: {
+                file: event.target.files[0],
+                preview: reader.result,
+            },
+        });
+        reader.onloadend = () => {
+            setImagePreview(reader.result);
+        };
+        if (selectedFile) {
+            reader.readAsDataURL(selectedFile);
+        }
+    };
+
+    const handleCreatePost = async (event) => {
+        event.preventDefault();
+        setIsLoading(true);
+
+        if (!post.title || !post.description || !post.image) {
+            Toast("error", "All fields are required");
+            setIsLoading(false);
+            return;
+        }
+        const formData = new FormData();
+
+        formData.append("user_id", userId);
+        formData.append("title", post.title);
+        formData.append("image", post.image.file);
+        formData.append("description", post.description);
+        formData.append("tags", post.tags);
+        formData.append("category", post.category);
+        formData.append("post_status", post.status);
+
+        try {
+            const response = await apiInstance.patch(
+                `author/dashboard/post-detail/${userId}/${param?.id}/`,
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+            console.log(response.data);
+            setIsLoading(false);
+            Swal.fire({
+                icon: "success",
+                title: "Post created successfully",
+            });
+            navigate("/posts/");
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     return (
         <>
             <Header />
@@ -18,16 +128,34 @@ function AddPost() {
                                             <div className="offset-lg-1 col-lg-10 col-md-12 col-12">
                                                 <div className="d-lg-flex align-items-center justify-content-between">
                                                     <div className="mb-4 mb-lg-0">
-                                                        <h1 className="text-white mb-1">Edit Blog Post</h1>
-                                                        <p className="mb-0 text-white lead">Use the article builder below to edit your article.</p>
+                                                        <h1 className="text-white mb-1">
+                                                            Edit Blog Post
+                                                        </h1>
+                                                        <p className="mb-0 text-white lead">
+                                                            Use the article
+                                                            builder below to
+                                                            edit your article.
+                                                        </p>
                                                     </div>
                                                     <div>
-                                                        <Link to="/instructor/posts/" className="btn" style={{ backgroundColor: "white" }}>
+                                                        <Link
+                                                            to="/instructor/posts/"
+                                                            className="btn"
+                                                            style={{
+                                                                backgroundColor:
+                                                                    "white",
+                                                            }}
+                                                        >
                                                             {" "}
-                                                            <i className="fas fa-arrow-left"></i> Back to Posts
+                                                            <i className="fas fa-arrow-left"></i>{" "}
+                                                            Back to Posts
                                                         </Link>
-                                                        <a href="instructor-posts.html" className="btn btn-dark ms-2">
-                                                            Save Changes <i className="fas fa-check-circle"></i>
+                                                        <a
+                                                            href="instructor-posts.html"
+                                                            className="btn btn-dark ms-2"
+                                                        >
+                                                            Save Changes{" "}
+                                                            <i className="fas fa-check-circle"></i>
                                                         </a>
                                                     </div>
                                                 </div>
@@ -35,55 +163,194 @@ function AddPost() {
                                         </div>
                                     </div>
                                 </section>
-                                <section className="pb-8 mt-5">
+                                <form
+                                    onSubmit={handleCreatePost}
+                                    className="pb-8 mt-5"
+                                >
                                     <div className="card mb-3">
                                         {/* Basic Info Section */}
                                         <div className="card-header border-bottom px-4 py-3">
-                                            <h4 className="mb-0">Basic Information</h4>
+                                            <h4 className="mb-0">
+                                                Basic Information
+                                            </h4>
                                         </div>
                                         <div className="card-body">
-                                            <label htmlFor="postTHumbnail" className="form-label">
+                                            <label
+                                                htmlFor="postTHumbnail"
+                                                className="form-label"
+                                            >
                                                 Preview
                                             </label>
-                                            <img style={{ width: "100%", height: "330px", objectFit: "cover", borderRadius: "10px" }} className="mb-4" src="https://www.eclosio.ong/wp-content/uploads/2018/08/default.png" alt="" />
+                                            <img
+                                                style={{
+                                                    width: "100%",
+                                                    height: "330px",
+                                                    objectFit: "cover",
+                                                    borderRadius: "10px",
+                                                }}
+                                                className="mb-4"
+                                                src={
+                                                    imagePreview || post?.image
+                                                }
+                                                alt=""
+                                            />
                                             <div className="mb-3">
-                                                <label htmlFor="postTHumbnail" className="form-label">
+                                                <label
+                                                    htmlFor="postTHumbnail"
+                                                    className="form-label"
+                                                >
                                                     Thumbnail
                                                 </label>
-                                                <input id="postTHumbnail" className="form-control" type="file" />
+                                                <input
+                                                    onChange={handleFileChange}
+                                                    id="postTHumbnail"
+                                                    name="file"
+                                                    className="form-control"
+                                                    type="file"
+                                                />
                                             </div>
 
                                             <div className="mb-3">
-                                                <label className="form-label">Title</label>
-                                                <input className="form-control" type="text" placeholder="" />
-                                                <small>Write a 60 character post title.</small>
+                                                <label className="form-label">
+                                                    Title
+                                                </label>
+                                                <input
+                                                    onChange={
+                                                        handleCreatePostChange
+                                                    }
+                                                    className="form-control"
+                                                    name="title"
+                                                    defaultValue={post?.title}
+                                                    type="text"
+                                                    placeholder=""
+                                                />
+                                                <small>
+                                                    Write a 60 character post
+                                                    title.
+                                                </small>
                                             </div>
                                             <div className="mb-3">
-                                                <label className="form-label">Posts category</label>
-                                                <select className="form-select">
-                                                    <option value="">-------------</option>
-                                                    <option value="React">Lifstyle</option>
-                                                    <option value="Javascript">Fashion</option>
-                                                    <option value="HTML">Tech</option>
-                                                    <option value="Vue">Health</option>
-                                                    <option value="Gulp">Entertainment</option>
+                                                <label className="form-label">
+                                                    Posts category
+                                                </label>
+                                                <select
+                                                    className="form-select"
+                                                    value={post.category?.id}
+                                                    onChange={
+                                                        handleCreatePostChange
+                                                    }
+                                                    name="category"
+                                                >
+                                                    <option value="">
+                                                        -------------
+                                                    </option>
+                                                    {categoryList?.map(
+                                                        (c, index) => (
+                                                            <option
+                                                                key={index}
+                                                                value={c?.id}
+                                                            >
+                                                                {c?.title}
+                                                            </option>
+                                                        )
+                                                    )}
                                                 </select>
-                                                <small>Help people find your posts by choosing categories that represent your post.</small>
+                                                <small>
+                                                    Help people find your posts
+                                                    by choosing categories that
+                                                    represent your post.
+                                                </small>
                                             </div>
 
                                             <div className="mb-3">
-                                                <label className="form-label">Post Description</label>
-                                                <textarea name="" className="form-control" id="" cols="30" rows="10"></textarea>
-                                                <small>A brief summary of your posts.</small>
+                                                <label className="form-label">
+                                                    Post Description
+                                                </label>
+                                                <textarea
+                                                    onChange={
+                                                        handleCreatePostChange
+                                                    }
+                                                    defaultValue={
+                                                        post?.description
+                                                    }
+                                                    name="description"
+                                                    className="form-control"
+                                                    id=""
+                                                    cols="30"
+                                                    rows="10"
+                                                ></textarea>
+                                                <small>
+                                                    A brief summary of your
+                                                    posts.
+                                                </small>
                                             </div>
-                                            <label className="form-label">Tag</label>
-                                            <input className="form-control" type="number" placeholder="health, medicine, fitness" />
+                                            <div>
+                                                <label
+                                                    htmlFor=""
+                                                    className="form-label"
+                                                >
+                                                    Status
+                                                </label>
+                                                <select
+                                                    className="form-select"
+                                                    value={post?.status}
+                                                    name="status"
+                                                    onChange={
+                                                        handleCreatePostChange
+                                                    }
+                                                    id=""
+                                                >
+                                                    <option value="Active">
+                                                        Active
+                                                    </option>
+                                                    <option value="Draft">
+                                                        Draft
+                                                    </option>
+                                                    <option value="Disabled">
+                                                        Disabled
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <label className="form-label">
+                                                Tag
+                                            </label>
+                                            <input
+                                                onChange={
+                                                    handleCreatePostChange
+                                                }
+                                                value={post?.tags}
+                                                name="tags"
+                                                className="form-control"
+                                                type="text"
+                                                placeholder="health, medicine, fitness"
+                                            />
                                         </div>
                                     </div>
-                                    <button className="btn btn-lg btn-success w-100 mt-2" type="button">
-                                        Update Post <i className="fas fa-check-circle"></i>
-                                    </button>
-                                </section>
+                                    {isLoading === true ? (
+                                        <>
+                                            {" "}
+                                            <button
+                                                disabled
+                                                className="btn btn-lg btn-secondary w-100 mt-2"
+                                                type="submit"
+                                            >
+                                                Saving Post...{" "}
+                                                <i className="fas fa-spinner fa-spin"></i>
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            {" "}
+                                            <button
+                                                className="btn btn-lg btn-success w-100 mt-2"
+                                                type="submit"
+                                            >
+                                                Save Changes{" "}
+                                                <i className="fas fa-check-circle"></i>
+                                            </button>
+                                        </>
+                                    )}
+                                </form>
                             </>
                         </div>
                     </div>
