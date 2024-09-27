@@ -27,7 +27,7 @@
       "react-photo-album": "^2.3.0",
       "react-router-dom": "6.10.0",
       "sweetalert2": "^11.7.32",
-      "yet-another-react-lightbox": "^3.14.0",
+      "yet-another-react-lightbox": "^3.21.4",
       "zustand": "^4.4.4"
   },
   "devDependencies": {
